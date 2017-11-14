@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <ui:composition>
+
+        <p:dialog id="IncidentEditDlg" widgetVar="IncidentEditDialog" modal="true" resizable="false" appendTo="@(body)" header="#{msgs_en.EditIncidentTitle}">
+            <h:form id="IncidentEditForm">
+                <h:panelGroup id="display">
+                    <p:panelGrid columns="2" rendered="#{incidentController.selected != null}">
+                         <p:outputLabel value="№ of Incident:" for="incNumber" />
+                        <p:inputText style="display: block" id="incNumber" value="#{incidentController.selected.incNumber}" title="#{msgs_en.CreateIncidentTitle_incNumber}" required="true" requiredMessage="#{msgs_en.CreateIncidentRequiredMessage_incNumber}"/>
+
+                        <p:outputLabel value="Incident Date:" for="incDate" />
+                        <p:calendar id="incDate" pattern="MM/dd/yyyy" value="#{incidentController.selected.incDate}" title="Date of first sumbition" showOn="button"/>
+
+                        <p:inputTextarea placeholder="Main Note" id="incTitle" value="#{incidentController.selected.incTitle}"  title="Main Note for the incident." rows="6" cols="33" required="true" requiredMessage="#{msgs_en.CreateIncidentRequiredMessage_incTitle}"/>
+
+                        <p:inputTextarea placeholder="Resolve Note" id="incDescription" value="#{incidentController.selected.incDescription}"  title="How it is fixed?" rows="6" cols="33" required="false" requiredMessage="#{msgs_en.CreateIncidentRequiredMessage_incDescription}"/>
+
+                        <p:outputLabel value="Is it solved?" for="incSolved" />
+                        <p:selectBooleanButton style="display: block" id="incSolved" value="#{incidentController.selected.incSolved}" onLabel="Yes" offLabel="No" onIcon="ui-icon-check" offIcon="ui-icon-close"/>
+
+                        <p:outputLabel value="Category: " for="incCat" />
+                        <p:selectOneMenu style="display: block" id="incCat" value="#{incidentController.selected.incCat}" >
+                            <f:selectItems value="#{categoryController.itemsAvailableSelectOne}"
+                                           var="incCatItem"
+                                           itemValue="#{incCatItem}"/>
+                        </p:selectOneMenu>
+                        
+                        <p:outputLabel value="System related: " for="incSystem" />
+                        <p:selectOneMenu style="display: block" id="incSystem" value="#{incidentController.selected.incSystem}" required="true" requiredMessage="#{msgs_en.EditIncidentRequiredMessage_incSystem}">
+                            <f:selectItems value="#{systemController.itemsAvailableSelectOne}"
+                                           var="incSystemItem"
+                                           itemValue="#{incSystemItem}"/>
+                        </p:selectOneMenu>
+                    </p:panelGrid>
+                    <p:commandButton actionListener="#{incidentController.update}" value="#{msgs_en.Save}" update="display,:IncidentListForm:datalist,:growl" oncomplete="handleSubmit(args, 'IncidentEditDialog');"/>
+                    <p:commandButton value="#{msgs_en.Cancel}" onclick="IncidentEditDialog.hide()"/>
+                </h:panelGroup>
+            </h:form>
+        </p:dialog>
+
+    </ui:composition>
+</html>

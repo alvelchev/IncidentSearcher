@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <ui:composition template="/template.xhtml">
+
+
+        <ui:define name="title">
+            <h:outputText value="#{msgs_en.ListIncidentTitle}"></h:outputText>
+        </ui:define>
+
+        <ui:define name="menuBar">
+            <h:form id="menuBarForm">
+                <p:commandButton style="width: 95%;padding-top: 10px;padding-bottom: 10px;" id="createButton" icon="ui-icon-plus"   value="#{msgs_en.Create}" actionListener="#{incidentController.prepareCreate}" update=":IncidentCreateForm" oncomplete="PF('IncidentCreateDialog').show()"/>
+                <p:commandButton style="width: 95%;padding-top: 10px;padding-bottom: 10px;" id="viewButton"   icon="ui-icon-search" value="#{msgs_en.View}" update=":IncidentViewForm" oncomplete="PF('IncidentViewDialog').show()" disabled="#{empty incidentController.selected}"/>
+                <p:commandButton style="width: 95%;padding-top: 10px;padding-bottom: 10px;" id="editButton"   icon="ui-icon-pencil" value="#{msgs_en.Edit}" update=":IncidentEditForm" oncomplete="PF('IncidentEditDialog').show()" disabled="#{empty incidentController.selected}"/>
+                <p:commandButton style="width: 95%;padding-top: 10px;padding-bottom: 10px;" id="deleteButton" icon="ui-icon-trash"  value="#{msgs_en.Delete}" actionListener="#{incidentController.destroy}" update=":growl,IncidentListForm:datalist" disabled="#{empty incidentController.selected}">
+                    <p:confirm header="Confirmation" message="Are you sure?" icon="ui-icon-alert" />
+                </p:commandButton>
+
+                <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                    <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                    <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                </p:confirmDialog>
+            </h:form>
+            <ui:include src="Create.xhtml"/>
+            <ui:include src="Edit.xhtml"/>
+            <ui:include src="View.xhtml"/>
+        </ui:define>
+
+        <ui:define name="body">
+
+
+            <p:fieldset legend="Search for incident by filtered criteria" style="width: 43em" >
+                <p:tabView>
+                    <p:tab title="INCIDENT NUMBER">
+                        <h:form>
+                            <h3>Search for partial strings or match words</h3>
+                            <p:inputText required="true" placeholder="Enter INC №.." value="#{incidentController.searchIncField}" requiredMessage="Please Type a Number of the Incident!" />
+                            <p:spacer width="5"/>
+                            <p:commandButton value="Search" update=":growl,IncidentListForm:datalist" actionListener="#{incidentController.searchByIncNumber}" icon="ui-icon-search" />                          
+                        </h:form>
+                    </p:tab>
+                    <p:tab title="DATE PERIOD">
+                        <h:form>
+                            <h3>(START) - will search for current date; (START + END) - will search for the period</h3>
+                            <p:calendar pattern="MM/dd/yyyy" placeholder="Pick START Date" required="true" requiredMessage="Please select a Start Date!" value="#{incidentController.startDateField}" />
+                            <br/>
+                            <p:calendar pattern="MM/dd/yyyy" placeholder="Pick END Date" value="#{incidentController.endDateField}" />
+                            <p:spacer width="5"/>
+                            <p:commandButton value="Search" update=":growl,IncidentListForm:datalist" icon="ui-icon-search" actionListener="#{incidentController.searchByIncDate}" />   
+                        </h:form>
+                    </p:tab>
+                    <p:tab title="MAIN NOTE">
+                        <h:form>
+                            <h3>Search in Main notes..</h3>
+                            <p:inputTextarea required="true" requiredMessage="Please select atleast one letter!" value="#{incidentController.mainNote}" placeholder="Enter string here.."  style="width: 20em"/>
+                            <p:spacer width="5"/>
+                            <p:commandButton value="Search" actionListener="#{incidentController.searchByMainNote}" icon="ui-icon-search"/>   
+                        </h:form>
+                    </p:tab>
+                    <p:tab title="RESOLVE NOTE">
+                        <h:form>
+                            <h3>Search in Resolve notes..</h3>
+                            <p:inputTextarea value="#{incidentController.resolveNote}" required="true" requiredMessage="Please select atleast one letter!" placeholder="Enter string here.."  style="width: 20em"/>
+                            <p:spacer width="5"/>
+                            <p:commandButton actionListener="#{incidentController.searchByMainNote}" value="Search" icon="ui-icon-search"/> 
+                        </h:form>
+                    </p:tab>
+                </p:tabView> 
+
+
+
+
+            </p:fieldset>
+            <br/>
+            <h:form id="IncidentListForm">
+                <p:panel header="ALL INCIDENTS">
+                    <p:dataTable id="datalist" value="#{incidentController.items}" var="item"
+                                 selectionMode="single" selection="#{incidentController.selected}"
+                                 paginator="true"
+                                 rowKey="#{item.incId}"
+                                 rows="10"
+                                 resizableColumns="true" 
+                                 rowsPerPageTemplate="10,20,30,40,50"
+                                 >
+
+                        <p:ajax event="rowSelect"   update="menuBarForm:createButton menuBarForm:viewButton menuBarForm:editButton menuBarForm:deleteButton"/>
+                        <p:ajax event="rowUnselect" update="menuBarForm:createButton menuBarForm:viewButton menuBarForm:editButton menuBarForm:deleteButton"/>
+
+
+                        <p:column style="text-align: center" sortBy="#{item.incNumber}">
+                            <f:facet name="header">
+                                <h:outputText value="№ of Incident"/>
+                            </f:facet>
+                            <h:outputText value="#{item.incNumber}"/>
+                        </p:column>
+                        <p:column style="text-align: center" sortBy="#{item.incDate}">
+                            <f:facet name="header">
+                                <h:outputText value="Incident Date"/>
+                            </f:facet>
+                            <h:outputText value="#{item.incDate}">
+                                <f:convertDateTime pattern="MM/dd/yyyy" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column style="text-align: center">
+                            <f:facet name="header">
+                                <h:outputText value="Main Note"/>
+                            </f:facet>
+                            <h:outputText value="#{item.incTitle}"/>
+                        </p:column>
+                        <p:column style="text-align: center">
+                            <f:facet name="header">
+                                <h:outputText value="Resolve Note"/>
+                            </f:facet>
+                            <h:outputText value="#{item.incDescription}"/>
+                        </p:column>
+                        <p:column style="text-align: center">
+                            <f:facet name="header">
+                                <h:outputText value="Solved?"/>
+                            </f:facet>
+                            <p:selectBooleanButton id="incSolved" disabled="true" value="#{item.incSolved}" onLabel="Yes" offLabel="No" onIcon="ui-icon-check" offIcon="ui-icon-close"/>
+                        </p:column>
+                        <p:column style="text-align: center">
+                            <f:facet name="header">
+                                <h:outputText value="#{msgs_en.ListIncidentTitle_incCat}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.incCat.catName}"/>
+                        </p:column>
+                        <p:column style="text-align: center">
+                            <f:facet name="header">
+                                <h:outputText value="#{msgs_en.ListIncidentTitle_incSystem}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.incSystem.systemName}"/>
+                        </p:column>
+
+                    </p:dataTable>
+                </p:panel>
+            </h:form>
+        </ui:define>
+    </ui:composition>
+
+</html>

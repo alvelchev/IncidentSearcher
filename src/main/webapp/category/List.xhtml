@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <ui:composition template="/template.xhtml">
+
+
+        <ui:define name="title">
+            <h:outputText value="#{msgs_en.ListCategoryTitle}"></h:outputText>
+        </ui:define>
+
+        <ui:define name="menuBar">
+            <h:form id="menuBarForm">    
+                <p:commandButton style="width: 100%;padding-top: 10px;padding-bottom: 10px;" id="createButton" icon="ui-icon-plus"   value="#{msgs_en.Create}" actionListener="#{categoryController.prepareCreate}" update=":CategoryCreateForm" oncomplete="PF('CategoryCreateDialog').show()"/>
+                <p:commandButton style="width: 100%;padding-top: 10px;padding-bottom: 10px;" id="viewButton"   icon="ui-icon-search" value="#{msgs_en.View}" update=":CategoryViewForm" oncomplete="PF('CategoryViewDialog').show()" disabled="#{empty categoryController.selected}"/>
+                <p:commandButton style="width: 100%;padding-top: 10px;padding-bottom: 10px;" id="editButton"   icon="ui-icon-pencil" value="#{msgs_en.Edit}" update=":CategoryEditForm" oncomplete="PF('CategoryEditDialog').show()" disabled="#{empty categoryController.selected}"/>
+                <p:commandButton style="width: 100%;padding-top: 10px;padding-bottom: 10px;" id="deleteButton" icon="ui-icon-trash"  value="#{msgs_en.Delete}" actionListener="#{categoryController.destroy}" update=":growl,CategoryListForm:datalist" disabled="#{empty categoryController.selected}">
+                    <p:confirm header="Confirmation" message="Are you sure?" icon="ui-icon-alert" />
+                </p:commandButton>
+                <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                    <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                    <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                </p:confirmDialog>
+            </h:form>
+            <ui:include src="Create.xhtml"/>
+            <ui:include src="Edit.xhtml"/>
+            <ui:include src="View.xhtml"/>
+        </ui:define>
+
+        <ui:define name="body">
+            <h:form id="CategoryListForm">
+                <p:panel header="ALL CATEGORIES">
+                    <h3>LEVEL 2 Category is for incidents witch has no resolve or redirection case.</h3>
+                    <h3>HELP DESK or Back Office is category for incidents that came here but the problem can be solved from the LEVEL 1 team.</h3>
+                    <h3>LEVEL 3 Categories if for incidents witch is for LEVEL 3.</h3>
+                    <h3>INC Manager category is for incidents that are fixed from LEVEL 2.</h3>
+                    <br/>
+                    <p:dataTable id="datalist" value="#{categoryController.items}" var="item"
+                                 selectionMode="single" selection="#{categoryController.selected}"
+                                 paginator="true"
+                                 rowKey="#{item.catId}"
+                                 rows="10"
+                                 rowsPerPageTemplate="10,20,30,40,50"
+                                 >
+
+                        <p:ajax event="rowSelect"   update="menuBarForm:createButton menuBarForm:viewButton menuBarForm:editButton menuBarForm:deleteButton"/>
+                        <p:ajax event="rowUnselect" update="menuBarForm:createButton menuBarForm:viewButton menuBarForm:editButton menuBarForm:deleteButton"/>
+
+                        <p:column style="text-align: center" sortBy="#{item.catName}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msgs_en.ListCategoryTitle_catName}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.catName}"/>
+                        </p:column>
+
+                    </p:dataTable>
+                </p:panel>
+            </h:form>
+        </ui:define>
+    </ui:composition>
+
+</html>

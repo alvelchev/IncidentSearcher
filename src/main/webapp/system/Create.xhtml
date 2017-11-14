@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <ui:composition>
+
+        <p:dialog id="SystemCreateDlg" widgetVar="SystemCreateDialog" modal="true" resizable="false" appendTo="@(body)" header="#{msgs_en.CreateSystemTitle}">
+            <h:form id="SystemCreateForm">
+                <h:panelGroup id="display">
+                    <p:panelGrid columns="2" rendered="#{systemController.selected != null}">
+                        <p:outputLabel value="#{msgs_en.CreateSystemLabel_systemName}" for="systemName" />
+                        <p:inputText id="systemName" value="#{systemController.selected.systemName}" title="#{msgs_en.CreateSystemTitle_systemName}" required="true" requiredMessage="#{msgs_en.CreateSystemRequiredMessage_systemName}"/>
+                    </p:panelGrid>
+                    <p:commandButton actionListener="#{systemController.create}" value="#{msgs_en.Save}" update="display,:SystemListForm:datalist,:growl" oncomplete="handleSubmit(args,'SystemCreateDialog');"/>
+                    <p:commandButton value="#{msgs_en.Cancel}" onclick="SystemCreateDialog.hide()"/>
+                </h:panelGroup>
+            </h:form>
+        </p:dialog>
+
+    </ui:composition>
+</html>
